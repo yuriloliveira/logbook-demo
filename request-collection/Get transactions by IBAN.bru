@@ -1,0 +1,15 @@
+meta {
+  name: Get transactions by IBAN
+  type: http
+  seq: 5
+}
+
+get {
+  url: http://localhost:8080/transactions?iban=CH0000000000000000000
+  body: none
+  auth: inherit
+}
+
+params:query {
+  iban: CH0000000000000000000
+}
