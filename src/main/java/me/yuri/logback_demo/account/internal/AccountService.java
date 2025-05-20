@@ -1,6 +1,7 @@
 package me.yuri.logback_demo.account.internal;
 
 import me.yuri.logback_demo.account.Account;
+import me.yuri.logback_demo.account.AccountNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
