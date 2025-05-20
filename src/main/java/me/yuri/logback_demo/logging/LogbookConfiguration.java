@@ -15,16 +15,16 @@ public class LogbookConfiguration {
     public Logbook logbook(HttpLogWriter writer) {
         HttpLogFormatter formatter = new ShortLogFormatter();
         return Logbook
-                .builder()
-                .sink(new DefaultSink(formatter, writer))
-                .headerFilter(headers -> {
-                    Map<String, List<String>> filteredHeaders = headers
-                        .entrySet()
-                        .stream()
-                        .filter(entry -> entry.getKey().equalsIgnoreCase("x-iban"))
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-                    return HttpHeaders.of(filteredHeaders);
-                })
-                .build();
+            .builder()
+            .sink(new DefaultSink(formatter, writer))
+            .headerFilter(headers -> {
+                Map<String, List<String>> filteredHeaders = headers
+                    .entrySet()
+                    .stream()
+                    .filter(entry -> entry.getKey().equalsIgnoreCase("x-iban"))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                return HttpHeaders.of(filteredHeaders);
+            })
+            .build();
     }
 }
