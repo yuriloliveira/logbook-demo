@@ -1,0 +1,17 @@
+meta {
+  name: Summary
+  type: http
+  seq: 8
+}
+
+post {
+  url: http://localhost:8080/summaries
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "iban": "ES26454631310694790265"
+  }
+}
