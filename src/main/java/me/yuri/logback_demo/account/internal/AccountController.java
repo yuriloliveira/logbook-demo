@@ -17,8 +17,8 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<Account> createAccount() {
-        Account createdAccount = accountService.createAccount();
+    public ResponseEntity<Account> createAccount(@RequestBody(required = false) String iban) {
+        Account createdAccount = accountService.createAccount(iban);
         return ResponseEntity.ok(createdAccount);
     }
 

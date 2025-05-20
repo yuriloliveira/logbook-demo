@@ -17,8 +17,8 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
-    public Account createAccount() {
-        Account account = new Account(randomIban());
+    public Account createAccount(String iban) {
+        Account account = new Account(iban != null ? iban : randomIban());
         return accountRepository.save(account);
     }
 
@@ -34,14 +34,14 @@ public class AccountService {
         accountRepository
             .findByIban(id)
             .ifPresentOrElse(
-                    account -> accountRepository.deleteByIban(id),
-                    () -> { throw new AccountNotFoundException("Account not found with id: " + id); }
+                account -> accountRepository.deleteByIban(id),
+                () -> { throw new AccountNotFoundException("Account not found with id: " + id); }
             );
     }
 
     /**
      * Generates a random IBAN (International Bank Account Number).
-     * Format: 2 letter country code + 2 check digits + up to 30 alphanumeric characters
+     * Format: 2 letters country code + 2 check digits + up to 30 alphanumeric characters
      *
      * @return A randomly generated IBAN
      */

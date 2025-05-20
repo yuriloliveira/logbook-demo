@@ -11,6 +11,15 @@ public class AccountClient {
         this.client = client;
     }
 
+    public Account createAccount(String iban) {
+        return client
+            .post()
+            .uri("/accounts")
+            .body(iban)
+            .retrieve()
+            .body(Account.class);
+    }
+
     public Account getAccountByIban(String iban) {
         return client
                 .get()
