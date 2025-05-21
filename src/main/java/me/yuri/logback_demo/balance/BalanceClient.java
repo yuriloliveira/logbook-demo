@@ -12,7 +12,7 @@ public class BalanceClient {
     Logger log = LoggerFactory.getLogger(BalanceClient.class);
     private final RestClient client;
 
-    BalanceClient(RestClient client) {
+    public BalanceClient(RestClient client) {
         this.client = client;
     }
 

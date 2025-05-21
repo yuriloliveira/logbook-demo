@@ -1,5 +1,6 @@
 package me.yuri.logback_demo.transfer;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -7,7 +8,10 @@ import org.springframework.web.client.RestClient;
 public class TransferClient {
     private final RestClient restClient;
 
-    public TransferClient(RestClient restClient) {
+    public TransferClient(
+        @Qualifier("RestClientWithLogging")
+        RestClient restClient
+    ) {
         this.restClient = restClient;
     }
 

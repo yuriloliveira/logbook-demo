@@ -9,7 +9,9 @@ import me.yuri.logback_demo.transaction.Transaction;
 import me.yuri.logback_demo.transaction.TransactionClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,10 +24,10 @@ public class SummaryService {
 
     private static final Logger log = LoggerFactory.getLogger(SummaryService.class);
 
-    public SummaryService(BalanceClient balanceClient, TransactionClient transactionClient, AccountClient accountClient) {
-        this.balanceClient = balanceClient;
-        this.transactionClient = transactionClient;
-        this.accountClient = accountClient;
+    public SummaryService(@Qualifier("RestClientWithLogging") RestClient restClient) {
+        this.balanceClient = new BalanceClient(restClient);
+        this.transactionClient = new TransactionClient(restClient);
+        this.accountClient = new AccountClient(restClient);
     }
 
     public Optional<Summary> loadSummaryByIban(String iban) {

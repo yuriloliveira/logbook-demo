@@ -1,30 +1,23 @@
 package me.yuri.logback_demo.logging;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.zalando.logbook.*;
+import org.zalando.logbook.HttpLogWriter;
+import org.zalando.logbook.Logbook;
 import org.zalando.logbook.core.DefaultSink;
+import org.zalando.logbook.core.SplunkHttpLogFormatter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import static org.zalando.logbook.json.JsonPathBodyFilters.jsonPath;
 
 @Configuration
 public class LogbookConfiguration {
-    @Bean
+//    @Bean
     public Logbook logbook(HttpLogWriter writer) {
-        HttpLogFormatter formatter = new ShortLogFormatter();
         return Logbook
             .builder()
-            .sink(new DefaultSink(formatter, writer))
-            .headerFilter(headers -> {
-                Map<String, List<String>> filteredHeaders = headers
-                    .entrySet()
-                    .stream()
-                    .filter(entry -> entry.getKey().equalsIgnoreCase("x-iban"))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-                return HttpHeaders.of(filteredHeaders);
-            })
+            .sink(new DefaultSink(new SplunkHttpLogFormatter(), writer))
+            .condition(request -> request.getPath().equalsIgnoreCase("/summaries"))
+            .headerFilter(headers -> headers.update("x-iban", "XXX"))
+            .bodyFilter(jsonPath("iban").replace("XXX"))
             .build();
     }
 }
