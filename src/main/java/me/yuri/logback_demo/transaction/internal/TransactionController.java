@@ -30,7 +30,7 @@ public class TransactionController {
         @RequestParam @NonNull String iban,
         @RequestParam(required = false) Integer count // TODO: support count
     ) {
-        List<Transaction> transactions = transactionService.getTransactionsByIban(iban);
+        List<Transaction> transactions = transactionService.getTransactionsByIban(iban, count);
         return ResponseEntity.ok(transactions);
     }
 }

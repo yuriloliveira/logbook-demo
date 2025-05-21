@@ -52,7 +52,6 @@ public class RestClientConfiguration {
                             return headers.update("x-iban", hiddenIban(iban));
                         }
                     }
-
                     return headers;
                 })
                 .queryFilter(query -> query.replaceAll("iban=[^&]+", "iban=XXX"))

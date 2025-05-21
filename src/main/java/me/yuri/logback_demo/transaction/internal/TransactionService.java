@@ -29,7 +29,13 @@ public class TransactionService {
         }
     }
 
-    public List<Transaction> getTransactionsByIban(String iban) {
-        return transactionRepository.findByIban(iban);
+    public List<Transaction> getTransactionsByIban(String iban, Integer count) {
+        var transactionsStream = transactionRepository.findByIban(iban).stream();
+        if (count != null) {
+            transactionsStream = transactionsStream.limit(count);
+        }
+
+        return transactionsStream.toList();
     }
+
 }
