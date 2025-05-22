@@ -1,5 +1,7 @@
 package me.yuri.logback_demo.transaction;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -9,6 +11,7 @@ import java.util.List;
 
 @Component
 public class TransactionClient {
+    private static final Logger log = LoggerFactory.getLogger(TransactionClient.class);
     private final RestClient client;
 
     public TransactionClient(RestClient client) {
@@ -25,7 +28,10 @@ public class TransactionClient {
     }
 
     public List<Transaction> getTransactionsByIban(String iban) {
-        return getTransactionsByIban(iban, null);
+        log.info("Fetching transactions for IBAN: '{}'", iban);
+        List<Transaction> transactions = getTransactionsByIban(iban, null);
+        log.info("Successfully fetched transactions for IBAN: '{}'", iban);
+        return transactions;
     }
 
     public List<Transaction> getTransactionsByIban(String iban, Integer count) {

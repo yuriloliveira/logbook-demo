@@ -31,20 +31,41 @@ public class SummaryService {
     }
 
     public Optional<Summary> loadSummaryByIban(String iban) {
+        log.info("Received iban {}", iban);
+
+        if (!isIbanValid(iban.toUpperCase())) throw new IllegalArgumentException("Provided IBAN is not valid");
+
         try {
             // Load account details
+            log.info("Loading account details for IBAN {}", iban);
             Account account = accountClient.getAccountByIban(iban);
 
             // Load balance
+            log.info("Loading balance for IBAN {}", iban);
             BalanceAmount balance = balanceClient.getBalanceByIban(iban);
 
+
             // Load last three transactions
+            log.info("Loading last three transactions for IBAN {}", iban);
             List<Transaction> lastThreeTransactions = transactionClient.getTransactionsByIban(iban, 3);
 
-            return Optional.of(new Summary(account, balance, lastThreeTransactions));
+            Summary summary = new Summary(account, balance, lastThreeTransactions);
+
+            log.info("Summary for IBAN {}: {}", iban, summary);
+
+            return Optional.of(summary);
         } catch (AccountNotFoundException anfe) {
             log.error("Account could not be found...", anfe);
             return Optional.empty();
         }
+    }
+
+    private boolean isIbanValid(String iban) {
+        boolean isIbanValid = iban != null && iban.matches("^[A-Z]{2}[0-9]{2}[A-Z0-9]{4}[0-9]+$");
+
+        if (isIbanValid) log.info("IBAN is valid: {}", iban);
+        else log.info("Requested IBAN is invalid: {}", iban);
+
+        return isIbanValid;
     }
 }
