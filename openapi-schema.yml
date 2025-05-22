@@ -1,0 +1,292 @@
+openapi: 3.0.3
+info:
+  title: Banking API
+  description: API for managing accounts, balances, transfers, transactions and summaries
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+paths:
+  /accounts:
+    post:
+      summary: Create a new account
+      description: Creates a new account with an optional IBAN
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              type: string
+              description: Optional IBAN for the new account
+        required: false
+      responses:
+        '200':
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+    get:
+      summary: Get all accounts
+      description: Retrieves a list of all available accounts
+      responses:
+        '200':
+          description: List of accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+
+  /accounts/{iban}:
+    get:
+      summary: Get account by IBAN
+      description: Retrieves account details for a specific IBAN
+      parameters:
+        - name: iban
+          in: path
+          required: true
+          schema:
+            type: string
+          description: IBAN of the account to retrieve
+      responses:
+        '200':
+          description: Account found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '404':
+          description: Account not found
+
+  /balances:
+    get:
+      summary: Get account balance
+      description: Retrieves the balance for an account specified by IBAN
+      parameters:
+        - name: x-iban
+          in: header
+          required: true
+          schema:
+            type: string
+          description: IBAN of the account to get the balance for
+      responses:
+        '200':
+          description: Balance retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceAmount'
+
+  /transfers:
+    post:
+      summary: Create a transfer
+      description: Creates a new money transfer between accounts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+      responses:
+        '200':
+          description: Transfer created successfully
+
+  /transactions:
+    post:
+      summary: Create a transaction
+      description: Creates a new transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        '201':
+          description: Transaction created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+
+    get:
+      summary: Get transactions by IBAN
+      description: Retrieves transactions for a specific account
+      parameters:
+        - name: iban
+          in: query
+          required: true
+          schema:
+            type: string
+          description: IBAN of the account to get transactions for
+        - name: count
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Optional limit on the number of transactions to return
+      responses:
+        '200':
+          description: Transactions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+
+  /summaries:
+    post:
+      summary: Get account summary
+      description: Retrieves a summary for an account based on IBAN
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SummaryRequest'
+      responses:
+        '200':
+          description: Summary retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Summary'
+        '404':
+          description: Account not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+components:
+  schemas:
+    Account:
+      type: object
+      properties:
+        iban:
+          type: string
+          description: International Bank Account Number
+      required:
+        - iban
+
+    BalanceAmount:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: double
+          description: Current balance amount
+      required:
+        - amount
+
+    TransferRequest:
+      type: object
+      properties:
+        sourceIban:
+          type: string
+          description: IBAN of the source account
+        targetIban:
+          type: string
+          description: IBAN of the target account
+        amount:
+          type: number
+          format: double
+          description: Amount to transfer
+      required:
+        - sourceIban
+        - targetIban
+        - amount
+
+    TransactionRequest:
+      type: object
+      properties:
+        sourceIban:
+          type: string
+          description: IBAN of the account originating the transaction
+        targetIban:
+          type: string
+          description: IBAN of the account receiving the transaction
+        amount:
+          type: number
+          format: double
+          description: Transaction amount
+      required:
+        - sourceIban
+        - targetIban
+        - amount
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: number
+          description: Unique identifier for the transaction
+        sourceIban:
+          type: string
+          description: IBAN of the account originating the transaction
+        targetIban:
+          type: string
+          description: IBAN of the account receiving the transaction
+        amount:
+          type: number
+          format: double
+          description: Transaction amount
+        timestamp:
+          type: string
+          format: date-time
+          description: When the transaction was recorded
+      required:
+        - id
+        - sourceIban
+        - targetIban
+        - amount
+        - timestamp
+
+    SummaryRequest:
+      type: object
+      properties:
+        iban:
+          type: string
+          description: IBAN of the account to get summary for
+      required:
+        - iban
+
+    Summary:
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/Account'
+        balance:
+          $ref: '#/components/schemas/BalanceAmount'
+        lastThreeTransactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+          description: The last three transactions for this account
+      required:
+        - iban
+        - balance
+        - lastThreeTransactions
+
+    ProblemDetail:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          description: URI reference that identifies the problem type
+        title:
+          type: string
+          description: Short, human-readable summary of the problem
+        status:
+          type: integer
+          description: HTTP status code
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence of the problem
+        instance:
+          type: string
+          format: uri
+          description: URI reference that identifies the specific occurrence of the problem
